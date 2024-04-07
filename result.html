@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200&family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gathery Voting</title>
+    <!-- Include Font Awesome CSS (you can change the version if needed) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200&family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="icon" type="image/png" href="../assets/logo.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        
+            body {
+background-color: #1f2937; /* Adjust to your preferred dark background color */
+}
+        #contentContainer {
+            text-align: center;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .participant-name {
+            width: 100%;
+            padding-left: 10px;
+            text-align: start;
+        }
+        .result-group {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-item {
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+            color: white;
+            background: radial-gradient(ellipse farthest-corner at right bottom, #C0C0C0 0%, #B0B0B0 8%, #A0A0A0 30%, #808080 40%, transparent 80%),
+                radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #E0E0E0 8%, #C0C0C0 25%, #808080 62.5%, #808080 100%); /* Silver background for top participant */
+        }
+
+        .result-item.golden {
+            background: radial-gradient(ellipse farthest-corner at right bottom, #fbd118 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+            radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #eded6d 8%, #D1B464 25%, #d0ab54 62.5%, #5d4a1f 100%); /* Golden background for top 3 participants */
+        }
+
+        .result-item.dark-golden {
+            background: radial-gradient(ellipse farthest-corner at right bottom, #453c17 0%, #35280d 8%, #4c3b15 30%, #56451d 40%, transparent 80%),
+            radial-gradient(ellipse farthest-corner at left top, #292727 0%, #2b2b25 8%, #463c22 25%, #5d4a1f 62.5%, #5d4a1f 100%); /* Golden background for top 3 participants */
+        }
+
+        
+        .result-item.grey-background {
+            background: radial-gradient(ellipse farthest-corner at right bottom, #030303 0%, #8585853f 8%, #565656 30%, #626262 40%, transparent 80%),
+                radial-gradient(ellipse farthest-corner at left top, #373737 0%, #3a3a3a 8%, #414141 25%, #575757 62.5%, #3a3a3a 100%); /* Silver background for top participant */
+            color:#dad8d8; /* Grey background for participants 4 and more */
+        }
+
+        .breadcrumb-wrapper .breadcrumb {
+            background-color: transparent; /* Ensure the breadcrumb background is transparent */
+            color: #ffffff; /* Set the breadcrumb text color to white or any other color that contrasts well with black */
+        }
+        .breadcrumb-wrapper .breadcrumb .breadcrumb-item a {
+            color: #ffffff; /* Set the link color */
+        }
+        .breadcrumb-wrapper .breadcrumb .breadcrumb-item.active {
+            color: #ffffff; /* Set the active item color */
+        }
+        .breadcrumb-wrapper .breadcrumb .breadcrumb-item.active::before {
+            color: #ffffff; /* Set the active item color */
+        }
+        .breadcrumb-wrapper .breadcrumb .breadcrumb-item::before {
+            color: #ffffff; /* Set the active item color */
+        }
+        a {
+            text-decoration: none;;
+        }
+    </style>
+    
+</head>
+<body>
+    <br>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <div style="width: 100%; height:100%" class="m">
+        <div id="contentContainer">
+            <div class="text-center" style="color: white;">
+                Вибір Жюрі
+            </div>
+            <div id="j-results" class="results-container">
+                <!-- Results will be displayed here dynamically -->
+            </div>
+            <div class="text-center" style="color: white;">
+                Глядацькі симпатії
+            </div>
+            <div id="results" class="results-container">
+                <!-- Results will be displayed here dynamically -->
+            </div>
+
+        </div>
+    </div>
+    
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+    apiKey: "AIzaSyBAfxQYO6TNJIdqOB6_DRM4e9NUa1NrWJ0",
+    authDomain: "voting-gathery.firebaseapp.com",
+    databaseURL: "https://voting-gathery-default-rtdb.firebaseio.com",
+    projectId: "voting-gathery",
+    storageBucket: "voting-gathery.appspot.com",
+    messagingSenderId: "236437354667",
+    appId: "1:236437354667:web:48c06bee64b290f4b35fee"
+  };
+  const firebaseConfig_ = {
+  apiKey: "AIzaSyARKCyiAbxjZ6PbmTasZeQamQvEyCXKl3c",
+  authDomain: "gathery-judge.firebaseapp.com",
+  databaseURL: "https://gathery-judge-default-rtdb.firebaseio.com",
+  projectId: "gathery-judge",
+  storageBucket: "gathery-judge.appspot.com",
+  messagingSenderId: "292987022887",
+  appId: "1:292987022887:web:be06fd10ebbd94b338a802"
+};
+        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig_, "jd");
+        
+        function displayResults() {
+            const resultsContainer = document.getElementById('results');
+
+            // Get user teacher from local storage
+            const userTeacher = localStorage.getItem('tj');
+
+            // Retrieve judges' top results
+            firebase.app("jd").database().ref('res').once('value', snapshot => {
+                const judges = snapshot.val();
+                const topParticipants = [];
+
+                // Retrieve the participants in the judges' top results
+                Object.values(judges).forEach(judgeResult => {
+                    Object.keys(judgeResult).forEach(participant => {
+                        if (!topParticipants.includes(participant)) {
+                            topParticipants.push(participant);
+                        }
+                    });
+                });
+
+                // Retrieve user results and filter out participants in the judges' top results
+                firebase.database().ref('part').orderByChild('votes').once('value', snapshot => {
+                    resultsContainer.innerHTML = '';
+
+                    const participants = [];
+
+                    snapshot.forEach(partSnapshot => {
+                        const partName = partSnapshot.key;
+                        const votesValue = partSnapshot.child('votes').val();
+                        const teachers = partSnapshot.child('teacher').val();
+                        console.log(teachers)
+
+                        // Check if the participant is not in the judges' top results
+                        if (!topParticipants.includes(partName)) {
+                            participants.push({ name: partName, votes: votesValue, teachers: teachers });
+                        }
+                    });
+
+                    participants.sort((a, b) => b.votes - a.votes);
+
+                    // Display filtered user results
+                    participants.forEach((participant, index) => {
+                        const participantItem = document.createElement('div');
+                        participantItem.className = 'result-item';
+                        const teachers = participant.teachers; // Define teachers here
+
+                        if (index === 0) {
+                            if (teachers.includes(localStorage.getItem("tj"))) {
+                                participantItem.classList.add('golden');
+                            } else {
+                                participantItem.classList.add('dark-golden');
+                            }
+                        } else {
+                            if (!teachers.includes(localStorage.getItem("tj"))) {
+                                participantItem.classList.add('grey-background');
+                            }
+                        }
+
+                        participantItem.innerHTML = `
+                            <div class="participant-name">${participant.name}</div>
+                            <div class="votes">${participant.votes}</div>
+                        `;
+                        resultsContainer.appendChild(participantItem);
+                    });
+                });
+            });
+        }
+        function displayJudgeResults() {
+            const resultsContainer = document.getElementById('j-results');
+
+            firebase.app("jd").database().ref('res').once('value', snapshot => {
+                // Clear existing content
+                resultsContainer.innerHTML = '';
+
+                const judges = snapshot.val();
+                const res = {};
+
+                // Retrieve participant data from Firebase
+                firebase.app("jd").database().ref('part').once('value', snapshot => {
+                    const participants = Object.keys(snapshot.val());
+
+                    // Initialize res object with participants and votes set to 0
+                    participants.forEach(participant => {
+                        res[participant] = 0;
+                    });
+
+                    // Loop through each judge
+                    Object.keys(judges).forEach(judgeName => {
+                        // Iterate through each participant for the current judge
+                        participants.forEach(participant => {
+                            // Add the judge's vote for the participant to the total
+                            res[participant] += judges[judgeName][participant];
+                        });
+                    });
+
+                    // Get the maxs count from Firebase
+                    firebase.app("jd").database().ref('sets/places').get().then(snapshot => {
+                        const maxs = snapshot.val();
+
+                        // Sort participants by votes and limit to maxs count
+                        const sortedParticipants = Object.entries(res)
+                            .sort(([, votesA], [, votesB]) => votesB - votesA)
+                            .slice(0, maxs);
+
+                        // Display the results
+                        sortedParticipants.forEach(([participant, votes], index) => {
+                            const participantItem = document.createElement('div');
+
+                            participantItem.className = 'result-item golden';
+
+                            if (index === 0) {
+                    
+                                participantItem.innerHTML = `
+                                    <div class="participant-name">
+                                        <i class="fas fa-crown" style="margin-right: 5px;"></i>${participant}
+                                    </div>
+                                    <div class="votes">${votes}</div>
+                                `;
+                            } else {
+                                participantItem.innerHTML = `
+                                    <div class="participant-name">${participant}</div>
+                                    <div class="votes">${votes}</div>
+                                `;
+                            }
+                            resultsContainer.appendChild(participantItem);
+                        });
+                    });
+                });
+            });
+        }
+
+        window.onload = function () {
+        // Check the result value and redirect accordingly
+        const resultRef = firebase.database().ref("settings/result");
+        resultRef.on("value", (resultSnapshot) => {
+          const resultValue = resultSnapshot.val();
+
+          if (resultValue === false) {
+            // Redirect to voting.html if result value is false
+            window.location.href = "voting.html";
+          } else {
+            // Set all log values to false when the result value is true
+
+            // Display results if result value is true
+            displayResults();
+          }
+        });
+      };
+
+// Call the function to display res results
+
+    displayJudgeResults();
+        displayResults()
+
+        
+    </script>
+</body>
+</html>
