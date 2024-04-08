@@ -16,10 +16,7 @@
     <!-- Include Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
-    <script src="scripts/user/index.js" defer></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <link rel="icon" type="image/png" href="assets/logo.png">
     
 </head>
@@ -122,7 +119,7 @@
 
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-            import { getDatabase, ref, get} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+            import { getDatabase, ref, get, onValue} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
             import {
             getAdditionalUserInfo,
             getAuth,
@@ -135,21 +132,19 @@
             } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
             const firebaseConfig = {
-    apiKey: "AIzaSyBAfxQYO6TNJIdqOB6_DRM4e9NUa1NrWJ0",
-    authDomain: "voting-gathery.firebaseapp.com",
-    databaseURL: "https://voting-gathery-default-rtdb.firebaseio.com",
-    projectId: "voting-gathery",
-    storageBucket: "voting-gathery.appspot.com",
-    messagingSenderId: "236437354667",
-    appId: "1:236437354667:web:48c06bee64b290f4b35fee"
-  };
+                apiKey: "AIzaSyBAfxQYO6TNJIdqOB6_DRM4e9NUa1NrWJ0",
+                authDomain: "voting-gathery.firebaseapp.com",
+                databaseURL: "https://voting-gathery-default-rtdb.firebaseio.com",
+                projectId: "voting-gathery",
+                storageBucket: "voting-gathery.appspot.com",
+                messagingSenderId: "236437354667",
+                appId: "1:236437354667:web:48c06bee64b290f4b35fee"
+            };
 
-            const app = initializeApp(firebaseConfig);
+            const app = initializeApp(firebaseConfig, "ss");
             const db = getDatabase(app)
             const auth = getAuth(app);
-            const username = localStorage.getItem('gathery_username');
-        const password = localStorage.getItem('gathery_password');
-
+      
         
             // Initialize Firebase
             
@@ -161,11 +156,13 @@
             }
 
             // Firebase reference for the result value
-            const resultRef = firebase.database().ref('settings/result');
+            const resultRef = ref(db, '/settings/result');
+           
 
             // Listen for changes in the result value
-            resultRef.on('value', resultSnapshot => {
+            onValue(resultRef, resultSnapshot => {
                 const resultValue = resultSnapshot.val();
+                console.log(resultValue)
 
                 if (resultValue === true) {
                     // Redirect to result.html if result value is true
