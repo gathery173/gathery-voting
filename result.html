@@ -69,22 +69,24 @@ background-color: #1f2937; /* Adjust to your preferred dark background color */
             color: white;
             background: radial-gradient(ellipse farthest-corner at right bottom, #C0C0C0 0%, #B0B0B0 8%, #A0A0A0 30%, #808080 40%, transparent 80%),
                 radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #E0E0E0 8%, #C0C0C0 25%, #808080 62.5%, #808080 100%); /* Silver background for top participant */
+ /* Grey background for other participants */
         }
 
         .result-item.golden {
-            background: radial-gradient(ellipse farthest-corner at right bottom, #fbd118 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
-            radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #eded6d 8%, #D1B464 25%, #d0ab54 62.5%, #5d4a1f 100%); /* Golden background for top 3 participants */
+            background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+            radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%); /* Golden background for top 3 participants */
         }
 
         .result-item.dark-golden {
-            background: radial-gradient(ellipse farthest-corner at right bottom, #453c17 0%, #35280d 8%, #4c3b15 30%, #56451d 40%, transparent 80%),
-            radial-gradient(ellipse farthest-corner at left top, #292727 0%, #2b2b25 8%, #463c22 25%, #5d4a1f 62.5%, #5d4a1f 100%); /* Golden background for top 3 participants */
+            color:#dad8d8;
+            background-color: #ba9025; /* Dark Golden background for top 3 participants without user as a teacher */
         }
 
         
         .result-item.grey-background {
-            background: radial-gradient(ellipse farthest-corner at right bottom, #030303 0%, #8585853f 8%, #565656 30%, #626262 40%, transparent 80%),
-                radial-gradient(ellipse farthest-corner at left top, #373737 0%, #3a3a3a 8%, #414141 25%, #575757 62.5%, #3a3a3a 100%); /* Silver background for top participant */
+            background: radial-gradient(ellipse farthest-corner at right bottom, #C0C0C0 0%, #B0B0B0 8%, #A0A0A0 30%, #808080 40%, transparent 80%),
+                radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #E0E0E0 8%, #C0C0C0 25%, #808080 62.5%, #808080 100%); /* Silver background for top participant */
+
             color:#dad8d8; /* Grey background for participants 4 and more */
         }
 
@@ -181,32 +183,15 @@ background-color: #1f2937; /* Adjust to your preferred dark background color */
 
                 // Display the results
                 filteredParticipants.forEach((participant, index) => {
+                firebase.database().ref("/").once("value", sn => {
+                    console.log(snapshot.val()[participant])
+                })
+               
                     const participantItem = document.createElement('div');
                     participantItem.className = 'result-item';
-                    firebase.database().ref('part').get().then(sn => {
-
-
-                        if (index === 0) {
-                            if (sn.val()[participant.name]["teacher"].includes(localStorage.getItem("tj"))) {
-                                
-                                    participantItem.classList.add('golden');
-                            } else {
-                                participantItem.classList.add('dark-golden');
-                            }
-                        } else {
-                            if (!sn.val()[participant.name]["teacher"].includes(localStorage.getItem("tj"))) {
-                               
-                                
-                                    participantItem.classList.add('grey-background');
-                            
-                                
-                        } 
-                        }
-                        
-                    })
-                    
-                    
-                    
+                    if (index === 0) {
+                        participantItem.classList.add('golden');
+                    }
 
                     participantItem.innerHTML = `
                         <div class="participant-name">${participant.name}</div>
@@ -233,6 +218,7 @@ background-color: #1f2937; /* Adjust to your preferred dark background color */
 
                     // Initialize res object with participants and votes set to 0
                     participants.forEach(participant => {
+                    
                         res[participant] = 0;
                     });
 
@@ -240,8 +226,12 @@ background-color: #1f2937; /* Adjust to your preferred dark background color */
                     Object.keys(judges).forEach(judgeName => {
                         // Iterate through each participant for the current judge
                         participants.forEach(participant => {
+                            
                             // Add the judge's vote for the participant to the total
-                            res[participant] += judges[judgeName][participant];
+                            const vote = judges[judgeName][participant];
+                            if (!isNaN(vote)) { // Check if the vote is a number
+                                res[participant] += vote;
+                            }
                         });
                     });
 
