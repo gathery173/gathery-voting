@@ -160,15 +160,7 @@
            
 
             // Listen for changes in the result value
-            onValue(resultRef, resultSnapshot => {
-                const resultValue = resultSnapshot.val();
-                console.log(resultValue)
-
-                if (resultValue === true) {
-                    // Redirect to result.html if result value is true
-                    redirectToResult();
-                }
-            });
+            
             signOut(auth)
         </script>
     </div>
